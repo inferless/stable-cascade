@@ -1,13 +1,15 @@
+import os
+os.environ["HF_HUB_ENABLE_HF_TRANSFER"]='1'
+from huggingface_hub import snapshot_download
 import torch
 from diffusers import StableCascadeDecoderPipeline, StableCascadePriorPipeline
-
 from io import BytesIO
 import base64
-from huggingface_hub import snapshot_download
-import os
 
 class InferlessPythonModel:
     def initialize(self):
+      snapshot_download(repo_id="stabilityai/stable-cascade-prior",allow_patterns=["*.safetensors"])
+      snapshot_download(repo_id="stabilityai/stable-cascade",allow_patterns=["*.safetensors"])
       self.prior = StableCascadePriorPipeline.from_pretrained("stabilityai/stable-cascade-prior", variant="bf16", torch_dtype=torch.bfloat16).to("cuda")
       self.decoder = StableCascadeDecoderPipeline.from_pretrained("stabilityai/stable-cascade", variant="bf16", torch_dtype=torch.float16).to("cuda")
 
